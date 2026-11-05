@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentFilter = 'all';
 
-    function addTodo() {
-        const text = todoInput.value.trim();
+    window.addItem = function(customText) {
+        const text = customText !== undefined ? customText : (todoInput ? todoInput.value.trim() : '');
         if (text === '') {
             if (errorMsg) errorMsg.style.display = 'block';
             return;
@@ -20,20 +20,22 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="todo-text">${text}</span>
             <button class="delete-btn">Delete</button>
         `;
-        todoList.appendChild(li);
-        todoInput.value = '';
+        if (todoList) todoList.appendChild(li);
+        if (todoInput && customText === undefined) todoInput.value = '';
         
         updateCounter();
         applyFilter();
-    }
+    };
 
     if (addTodoBtn) {
-        addTodoBtn.addEventListener('click', addTodo);
+        addTodoBtn.addEventListener('click', () => {
+            if (todoInput) window.addItem(todoInput.value.trim());
+        });
     }
     if (todoInput) {
         todoInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                addTodo();
+                if (todoInput) window.addItem(todoInput.value.trim());
             }
         });
     }
@@ -53,11 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    window.items = function() {
+        if (!todoList) return [];
+        return todoList.querySelectorAll('li');
+    };
+
     function updateCounter() {
         if (!counter) return;
-        const items = todoList.querySelectorAll('li');
+        const itemsList = todoList ? todoList.querySelectorAll('li') : [];
         let activeCount = 0;
-        items.forEach(item => {
+        itemsList.forEach(item => {
             if (!item.classList.contains('completed')) {
                 activeCount++;
             }
@@ -66,8 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyFilter() {
-        const items = todoList.querySelectorAll('li');
-        items.forEach(item => {
+        if (!todoList) return;
+        const itemsList = todoList.querySelectorAll('li');
+        itemsList.forEach(item => {
             const isCompleted = item.classList.contains('completed');
             if (currentFilter === 'all') {
                 item.style.display = '';
