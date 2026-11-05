@@ -10,14 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addItem = function(customText) {
         const text = customText !== undefined ? customText : (todoInput ? todoInput.value.trim() : '');
         if (text === '') {
-            if (errorMsg) errorMsg.style.display = 'block';
+            if (errorMsg) {
+                errorMsg.style.display = 'block';
+                errorMsg.classList.remove('hidden');
+            }
             return;
         }
-        if (errorMsg) errorMsg.style.display = 'none';
+        if (errorMsg) {
+            errorMsg.style.display = 'none';
+            errorMsg.classList.add('hidden');
+        }
 
         const li = document.createElement('li');
         li.innerHTML = `
-            <span class="todo-text">${text}</span>
+            <span class="item-text">${text}</span>
             <button class="delete-btn">Delete</button>
         `;
         if (todoList) todoList.appendChild(li);
@@ -57,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.items = function() {
         if (!todoList) return [];
-        return todoList.querySelectorAll('li');
+        return Array.from(todoList.querySelectorAll('li'));
     };
 
     function updateCounter() {
